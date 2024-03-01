@@ -38,6 +38,8 @@ public class TicTacToeModel {
 	 * Constructeur privé.
 	 */
 	private TicTacToeModel() {
+		this.board = null;
+		this.winningBoard = null;
 	}
 
 	/**
@@ -58,12 +60,15 @@ public class TicTacToeModel {
 	}
 
 	public final ObjectProperty<Owner> turnProperty() {
+		return turn;
 	}
 
 	public final ObjectProperty<Owner> getSquare(int row, int column) {
+		return turn;
 	}
 
 	public final BooleanProperty getWinningSquare(int row, int column) {
+		return null;
 	}
 
 	/**
@@ -73,12 +78,14 @@ public class TicTacToeModel {
 	 * @return résultat du jeu sous forme de texte
 	 */
 	public final StringExpression getEndOfGameMessage() {
+		return null;
 	}
 
 	public void setWinner(Owner winner) {
 	}
 
 	public boolean validSquare(int row, int column) {
+		return false;
 	}
 
 	public void nextPlayer() {
@@ -95,9 +102,11 @@ public class TicTacToeModel {
 	 *         libre et le jeu n’est pas terminé
 	 */
 	public BooleanBinding legalMove(int row, int column) {
+		return null;
 	}
 
 	public NumberExpression getScore(Owner owner) {
+		return null;
 	}
 
 	/**
@@ -105,6 +114,7 @@ public class TicTacToeModel {
 	 *         plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
+		return null;
 	}
 
 }

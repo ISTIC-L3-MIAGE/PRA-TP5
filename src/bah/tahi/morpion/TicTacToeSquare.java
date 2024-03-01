@@ -16,9 +16,11 @@ public class TicTacToeSquare extends TextField {
 	private BooleanProperty winnerProperty = new SimpleBooleanProperty(false);
 
 	public ObjectProperty<Owner> ownerProperty() {
+		return ownerProperty;
 	}
 
 	public BooleanProperty colorProperty() {
+		return winnerProperty;
 	}
 
 	public TicTacToeSquare(final int row, final int column) {

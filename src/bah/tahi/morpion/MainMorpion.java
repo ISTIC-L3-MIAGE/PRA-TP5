@@ -5,18 +5,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class MainMorpion extends Application {
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(Stage stage) throws Exception {
 		try {
-			GridPane root = (GridPane) FXMLLoader.load(getClass().getResource("morpionScene.fxml"));
-			Scene scene = new Scene(root, 400, 400);
+			Pane root = (Pane) FXMLLoader.load(getClass().getResource("morpionScene.fxml"));
+			Scene scene = new Scene(root);
 
-			primaryStage.setScene(scene);
-			primaryStage.show();
+			stage.setTitle("Morpion");
+			stage.setScene(scene);
+			stage.sizeToScene();
+			stage.show();
 
 		} catch (Exception e) {
 			e.printStackTrace();

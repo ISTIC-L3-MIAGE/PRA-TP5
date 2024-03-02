@@ -1,11 +1,10 @@
 package bah.tahi.morpion;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerExpression;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.binding.StringExpression;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 public class TicTacToeModel {
 	/**
@@ -38,8 +37,19 @@ public class TicTacToeModel {
 	 * Constructeur privé.
 	 */
 	private TicTacToeModel() {
-		this.board = null;
-		this.winningBoard = null;
+		this.board = new SimpleObjectProperty[BOARD_HEIGHT][BOARD_WIDTH];
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				this.board[i][j] = new SimpleObjectProperty<>(Owner.NONE);
+			}
+		}
+
+		this.winningBoard = new SimpleBooleanProperty[BOARD_HEIGHT][BOARD_WIDTH];
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				this.winningBoard[i][j] = new SimpleBooleanProperty(false);
+			}
+		}
 	}
 
 	/**
@@ -60,11 +70,15 @@ public class TicTacToeModel {
 	}
 
 	public final ObjectProperty<Owner> turnProperty() {
-		return turn;
+		return this.turn;
+	}
+
+	public final ObjectProperty<Owner> winnerProperty() {
+		return this.winner;
 	}
 
 	public final ObjectProperty<Owner> getSquare(int row, int column) {
-		return turn;
+		return this.board[row][column];
 	}
 
 	public final BooleanProperty getWinningSquare(int row, int column) {
@@ -78,23 +92,45 @@ public class TicTacToeModel {
 	 * @return résultat du jeu sous forme de texte
 	 */
 	public final StringExpression getEndOfGameMessage() {
-		return null;
+		String msgString = "Game Over. Match nul.";
+		Owner winner = this.winnerProperty().get();
+
+		if (winner.equals(Owner.FIRST)) {
+			msgString = "Game Over. Le gagnant est le premier joueur.";
+		} else if (winner.equals(Owner.SECOND)) {
+			msgString = "Game Over. Le gagnant est le deuxième joueur.";
+		}
+
+		return new SimpleStringProperty(msgString);
+
 	}
 
 	public void setWinner(Owner winner) {
+		this.winnerProperty().set(winner);
 	}
 
+	/**
+	 * @param row    numéro de ligne
+	 * @param column numéro de colonne
+	 * @return true si les paramètres pointent sur une case du plateau de jeu
+	 */
 	public boolean validSquare(int row, int column) {
-		return false;
+		return 0 <= row && row < BOARD_HEIGHT && 0 <= column && column < BOARD_WIDTH;
 	}
 
-	public void nextPlayer() {
+	/**
+	 * Changer le joueur courant
+	 */
+	public void nextPlayer() { // OK
+		this.turnProperty().set(this.turnProperty().get().opposite());
 	}
 
 	/**
 	 * Jouer dans la case (row, column) quand c’est possible.
 	 */
 	public void play(int row, int column) {
+		this.board[row][column].set(this.turnProperty().get());
+		this.nextPlayer();
 	}
 
 	/**
@@ -102,19 +138,34 @@ public class TicTacToeModel {
 	 *         libre et le jeu n’est pas terminé
 	 */
 	public BooleanBinding legalMove(int row, int column) {
-		return null;
-	}
-
-	public NumberExpression getScore(Owner owner) {
-		return null;
+		return this.board[row][column].isEqualTo(Owner.NONE).and(this.gameOver().not());
 	}
 
 	/**
-	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a
-	 *         plus de cases à jouer)
+	 * @return Le nombre de coups joué par owner
+	 */
+	public NumberExpression getScore(Owner owner) { // OK
+		IntegerExpression score = new SimpleIntegerProperty(0);
+
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				if (this.board[i][j].get().equals(owner)) {
+					score.add(1);
+				}
+			}
+		}
+
+		return score;
+	}
+
+	/**
+	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
-		return null;
+		int nbCases = BOARD_HEIGHT * BOARD_WIDTH;
+		IntegerExpression scoreTotal = new SimpleIntegerProperty(0);
+
+		return this.winner.isNotEqualTo(Owner.NONE).or(scoreTotal.isEqualTo(nbCases));
 	}
 
 }

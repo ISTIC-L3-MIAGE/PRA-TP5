@@ -19,6 +19,7 @@ public class MainMorpion extends Application {
 			stage.setTitle("Morpion");
 			stage.setScene(scene);
 			stage.sizeToScene();
+			stage.setResizable(false);
 			stage.show();
 
 		} catch (Exception e) {

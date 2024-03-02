@@ -4,13 +4,19 @@ public enum Owner {
 	NONE, FIRST, SECOND;
 
 	public Owner opposite() {
-		switch (this) {
-		case SECOND:
-			return FIRST;
-		case FIRST:
-			return SECOND;
-		default:
-			return NONE;
-		}
+        return switch (this) {
+			case FIRST -> SECOND;
+			case SECOND -> FIRST;
+            default -> NONE;
+        };
+	}
+
+	@Override
+	public String toString() {
+		return switch (this) {
+			case FIRST -> "X";
+			case SECOND -> "O";
+			default -> "-";
+		};
 	}
 }

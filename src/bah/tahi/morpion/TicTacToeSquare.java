@@ -22,15 +22,14 @@ public class TicTacToeSquare extends TextField {
 		return winnerProperty;
 	}
 
-	private final int row;
-	private final int column;
 
 	public TicTacToeSquare(final int row, final int column) {
-		this.row = row;
-		this.column = column;
 
 		this.setEditable(false);
 		this.setStyle("-fx-font-size: 24; -fx-alignment: center;");
+		// Définir la taille maximale et minimale pour occuper 100% de l'espace disponible
+		this.setMaxWidth(Double.MAX_VALUE);
+		this.setMaxHeight(Double.MAX_VALUE);
 
 		this.ownerProperty.addListener((observable, oldValue, newValue) -> {
 			this.setText(newValue.toString());

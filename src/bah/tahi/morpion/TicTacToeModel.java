@@ -38,18 +38,8 @@ public class TicTacToeModel {
 	 */
 	private TicTacToeModel() {
 		this.board = new SimpleObjectProperty[BOARD_HEIGHT][BOARD_WIDTH];
-		for (int i = 0; i < BOARD_HEIGHT; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				this.board[i][j] = new SimpleObjectProperty<>(Owner.NONE);
-			}
-		}
-
 		this.winningBoard = new SimpleBooleanProperty[BOARD_HEIGHT][BOARD_WIDTH];
-		for (int i = 0; i < BOARD_HEIGHT; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				this.winningBoard[i][j] = new SimpleBooleanProperty(false);
-			}
-		}
+		this.restart();
 	}
 
 	/**
@@ -67,6 +57,19 @@ public class TicTacToeModel {
 	}
 
 	public void restart() {
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				this.board[i][j] = new SimpleObjectProperty<>(Owner.NONE);
+			}
+		}
+
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				this.winningBoard[i][j] = new SimpleBooleanProperty(false);
+			}
+		}
+
+		System.out.println("Restart");
 	}
 
 	public final ObjectProperty<Owner> turnProperty() {
@@ -92,17 +95,17 @@ public class TicTacToeModel {
 	 * @return résultat du jeu sous forme de texte
 	 */
 	public final StringExpression getEndOfGameMessage() {
-		String msgString = "Game Over. Match nul.";
-		Owner winner = this.winnerProperty().get();
+		String msgString = "Partie en cours";
 
-		if (winner.equals(Owner.FIRST)) {
-			msgString = "Game Over. Le gagnant est le premier joueur.";
-		} else if (winner.equals(Owner.SECOND)) {
-			msgString = "Game Over. Le gagnant est le deuxième joueur.";
+		if (this.gameOver().get()) {
+			msgString = switch (this.winnerProperty().get()) {
+				case Owner.FIRST -> "Game Over. Le gagnant est le premier joueur.";
+				case Owner.SECOND -> "Game Over. Le gagnant est le deuxième joueur.";
+				default -> "Game Over. Match nul.";
+			};
 		}
 
 		return new SimpleStringProperty(msgString);
-
 	}
 
 	public void setWinner(Owner winner) {
@@ -156,6 +159,11 @@ public class TicTacToeModel {
 		}
 
 		return score;
+	}
+
+	public final StringExpression getScoreMessage(Owner owner) {
+		String msgString = this.getScore(owner).intValue() + " cases pour " + owner.toString();
+		return new SimpleStringProperty(msgString);
 	}
 
 	/**

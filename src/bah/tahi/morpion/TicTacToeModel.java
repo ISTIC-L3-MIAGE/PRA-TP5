@@ -1,10 +1,10 @@
 package bah.tahi.morpion;
 
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.IntegerExpression;
-import javafx.beans.binding.NumberExpression;
-import javafx.beans.binding.StringExpression;
+import javafx.beans.binding.*;
 import javafx.beans.property.*;
+import javafx.collections.ObservableMap;
+
+import static javafx.collections.FXCollections.observableHashMap;
 
 public class TicTacToeModel {
 	/**
@@ -12,6 +12,11 @@ public class TicTacToeModel {
 	 */
 	private final static int BOARD_WIDTH = 3;
 	private final static int BOARD_HEIGHT = 3;
+	/**
+	 * Scores des joueurs.
+	 */
+	private final ObservableMap<Owner, IntegerProperty> scores = observableHashMap();
+
 	/**
 	 * Nombre de pièces alignés pour gagner (idem).
 	 */
@@ -37,8 +42,23 @@ public class TicTacToeModel {
 	 * Constructeur privé.
 	 */
 	private TicTacToeModel() {
+		// Board init
 		this.board = new SimpleObjectProperty[BOARD_HEIGHT][BOARD_WIDTH];
 		this.winningBoard = new SimpleBooleanProperty[BOARD_HEIGHT][BOARD_WIDTH];
+
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				this.board[i][j] = new SimpleObjectProperty<>(Owner.NONE);
+				this.winningBoard[i][j] = new SimpleBooleanProperty(false);
+			}
+		}
+
+		// Score init
+		scores.put(Owner.FIRST, new SimpleIntegerProperty(0));
+		scores.put(Owner.SECOND, new SimpleIntegerProperty(0));
+		scores.put(Owner.NONE, new SimpleIntegerProperty(this.getNbCases()));
+
+		// Square init
 		this.restart();
 	}
 
@@ -56,20 +76,27 @@ public class TicTacToeModel {
 		private static final TicTacToeModel INSTANCE = new TicTacToeModel();
 	}
 
+	public int getNbCases() {
+		return BOARD_HEIGHT * BOARD_WIDTH;
+	}
+
 	public void restart() {
+		// Vider les cases
 		for (int i = 0; i < BOARD_HEIGHT; i++) {
 			for (int j = 0; j < BOARD_WIDTH; j++) {
-				this.board[i][j] = new SimpleObjectProperty<>(Owner.NONE);
+				this.getSquare(i, j).set(Owner.NONE);
+				this.getWinningSquare(i, j).set(false);
 			}
 		}
 
-		for (int i = 0; i < BOARD_HEIGHT; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				this.winningBoard[i][j] = new SimpleBooleanProperty(false);
-			}
-		}
+		// Réinitialiser les scores
+		this.scores.get(Owner.FIRST).set(0);
+		this.scores.get(Owner.SECOND).set(0);
+		this.scores.get(Owner.NONE).set(this.getNbCases());
 
-		System.out.println("Restart");
+		// Réinitialiser des joueurs
+		this.turnProperty().set(Owner.FIRST);
+		this.winnerProperty().set(Owner.NONE);
 	}
 
 	public final ObjectProperty<Owner> turnProperty() {
@@ -85,7 +112,7 @@ public class TicTacToeModel {
 	}
 
 	public final BooleanProperty getWinningSquare(int row, int column) {
-		return null;
+		return this.winningBoard[row][column];
 	}
 
 	/**
@@ -95,17 +122,20 @@ public class TicTacToeModel {
 	 * @return résultat du jeu sous forme de texte
 	 */
 	public final StringExpression getEndOfGameMessage() {
-		String msgString = "Partie en cours";
-
-		if (this.gameOver().get()) {
-			msgString = switch (this.winnerProperty().get()) {
-				case Owner.FIRST -> "Game Over. Le gagnant est le premier joueur.";
-				case Owner.SECOND -> "Game Over. Le gagnant est le deuxième joueur.";
-				default -> "Game Over. Match nul.";
-			};
-		}
-
-		return new SimpleStringProperty(msgString);
+		return Bindings.createStringBinding(() -> {
+			if (this.gameOver().get()) {
+				switch (this.winnerProperty().get()) {
+					case FIRST:
+						return "Game Over. Le gagnant est le premier joueur.";
+					case SECOND:
+						return "Game Over. Le gagnant est le deuxième joueur.";
+					default:
+						return "Game Over. Match nul.";
+				}
+			} else {
+				return "Partie en cours";
+			}
+		}, this.winnerProperty());
 	}
 
 	public void setWinner(Owner winner) {
@@ -129,12 +159,137 @@ public class TicTacToeModel {
 	}
 
 	/**
+	 * Met à jour les scores après chaque coup.
+	 */
+	public void updateScores(Owner owner) {
+		IntegerProperty score = this.scores.get(owner);
+		IntegerProperty freeCases = this.scores.get(Owner.NONE);
+
+		score.set(score.get() + 1);
+		freeCases.set(freeCases.get() - 1);
+	}
+
+	/**
 	 * Jouer dans la case (row, column) quand c’est possible.
 	 */
 	public void play(int row, int column) {
 		this.board[row][column].set(this.turnProperty().get());
+		this.updateScores(this.turnProperty().get());
+		this.checkWin();
 		this.nextPlayer();
 	}
+
+	public void checkWin() {
+		// Parcourir les lignes
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			if (checkRow(i)) return;
+		}
+
+		// Parcourir les colonnes
+		for (int j = 0; j < BOARD_WIDTH; j++) {
+			if (checkColumn(j)) return;
+		}
+
+		// Vérifier les diagonales
+		if (checkDiagonals()) return;
+
+		// S'il n'y a pas de gagnant et que toutes les cases sont remplies, déclarer un match nul
+		if (isBoardFull()) {
+			setWinner(Owner.NONE); // Match nul
+		}
+	}
+
+	private boolean checkRow(int row) {
+		Owner firstCell = getSquare(row, 0).get();
+		if (firstCell == Owner.NONE) return false;
+
+		for (int j = 1; j < BOARD_WIDTH; j++) {
+			if (!getSquare(row, j).get().equals(firstCell)) {
+				return false; // Pas de victoire dans cette ligne
+			}
+		}
+
+		// Marquer la ligne comme gagnante
+		markWinningRow(row);
+		setWinner(firstCell);
+		return true;
+	}
+
+	private boolean checkColumn(int column) {
+		Owner firstCell = getSquare(0, column).get();
+		if (firstCell == Owner.NONE) return false;
+
+		for (int i = 1; i < BOARD_HEIGHT; i++) {
+			if (!getSquare(i, column).get().equals(firstCell)) {
+				return false; // Pas de victoire dans cette colonne
+			}
+		}
+
+		// Marquer la colonne comme gagnante
+		markWinningColumn(column);
+		setWinner(firstCell);
+		return true;
+	}
+
+	private boolean checkDiagonals() {
+		// Vérifier la diagonale principale
+		Owner topLeft = getSquare(0, 0).get();
+		if (topLeft != Owner.NONE && topLeft == getSquare(1, 1).get() && topLeft == getSquare(2, 2).get()) {
+			markWinningDiagonal(true);
+			setWinner(topLeft);
+			return true;
+		}
+
+		// Vérifier la diagonale inverse
+		Owner topRight = getSquare(0, 2).get();
+		if (topRight != Owner.NONE && topRight == getSquare(1, 1).get() && topRight == getSquare(2, 0).get()) {
+			markWinningDiagonal(false);
+			setWinner(topRight);
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean isBoardFull() {
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				if (getSquare(i, j).get() == Owner.NONE) {
+					return false; // Il y a encore des cases vides
+				}
+			}
+		}
+		return true; // Toutes les cases sont remplies
+	}
+
+	private void markWinningRow(int row) {
+		for (int j = 0; j < BOARD_WIDTH; j++) {
+			getWinningSquare(row, j).set(true);
+		}
+	}
+
+	private void markWinningDiagonal(boolean reverse) {
+		if (!reverse) {
+			// Marquer la diagonale principale
+			for (int i = 0; i < BOARD_HEIGHT; i++) {
+				getWinningSquare(i, i).set(true);
+			}
+		} else {
+			// Marquer la diagonale secondaire
+			for (int i = 0; i < BOARD_HEIGHT; i++) {
+				getWinningSquare(i, BOARD_WIDTH - 1 - i).set(true);
+			}
+		}
+	}
+
+
+	private void markWinningColumn(int column) {
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+			getWinningSquare(i, column).set(true);
+		}
+	}
+
+
 
 	/**
 	 * @return true s’il est possible de jouer dans la case c’est-à-dire la case est
@@ -148,32 +303,15 @@ public class TicTacToeModel {
 	 * @return Le nombre de coups joué par owner
 	 */
 	public NumberExpression getScore(Owner owner) { // OK
-		IntegerExpression score = new SimpleIntegerProperty(0);
-
-		for (int i = 0; i < BOARD_HEIGHT; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				if (this.board[i][j].get().equals(owner)) {
-					score.add(1);
-				}
-			}
-		}
-
-		return score;
+		return this.scores.get(owner);
 	}
 
-	public final StringExpression getScoreMessage(Owner owner) {
-		String msgString = this.getScore(owner).intValue() + " cases pour " + owner.toString();
-		return new SimpleStringProperty(msgString);
-	}
 
 	/**
 	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
-		int nbCases = BOARD_HEIGHT * BOARD_WIDTH;
-		IntegerExpression scoreTotal = new SimpleIntegerProperty(0);
-
-		return this.winner.isNotEqualTo(Owner.NONE).or(scoreTotal.isEqualTo(nbCases));
+		return this.winner.isNotEqualTo(Owner.NONE);
 	}
 
 }

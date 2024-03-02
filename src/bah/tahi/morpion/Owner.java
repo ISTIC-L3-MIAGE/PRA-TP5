@@ -1,5 +1,7 @@
 package bah.tahi.morpion;
 
+import javafx.beans.property.IntegerProperty;
+
 public enum Owner {
 	NONE, FIRST, SECOND;
 
@@ -16,7 +18,7 @@ public enum Owner {
 		return switch (this) {
 			case FIRST -> "X";
 			case SECOND -> "O";
-			default -> "-";
+			default -> "";
 		};
 	}
 }

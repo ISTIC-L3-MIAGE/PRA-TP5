@@ -40,7 +40,8 @@ public class MorpionController {
                 square.ownerProperty().bindBidirectional(model.getSquare(i, j));
 
                 // Ajouter les square à la grille
-                this.grid.add(square, i, j);
+                //this.grid.add(square, i, j);
+                this.grid.add(square, j, i);
             }
         }
 

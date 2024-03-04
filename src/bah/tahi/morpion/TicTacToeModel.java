@@ -122,20 +122,23 @@ public class TicTacToeModel {
 	 * @return résultat du jeu sous forme de texte
 	 */
 	public final StringExpression getEndOfGameMessage() {
-		return Bindings.createStringBinding(() -> {
-			if (this.gameOver().get()) {
-				switch (this.winnerProperty().get()) {
-					case FIRST:
-						return "Game Over. Le gagnant est le premier joueur.";
-					case SECOND:
-						return "Game Over. Le gagnant est le deuxième joueur.";
-					default:
-						return "Game Over. Match nul.";
-				}
-			} else {
-				return "Partie en cours";
+		return new StringBinding() {
+			{
+				bind(winnerProperty(), getScore(Owner.NONE));
 			}
-		}, this.winnerProperty());
+			@Override
+			protected String computeValue() {
+				if (gameOver().get()) {
+					return switch (winnerProperty().get()) {
+						case FIRST -> "Game Over. Le gagnant est le premier joueur.";
+						case SECOND -> "Game Over. Le gagnant est le deuxième joueur.";
+						default -> "Game Over. Match nul.";
+					};
+				} else {
+					return "Partie en cours";
+				}
+			}
+		};
 	}
 
 	public void setWinner(Owner winner) {
@@ -303,7 +306,15 @@ public class TicTacToeModel {
 	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
-		return this.winner.isNotEqualTo(Owner.NONE);
+		return this.winner.isNotEqualTo(Owner.NONE).or(new BooleanBinding() {
+			{
+				bind(winnerProperty(), getScore(Owner.NONE));
+			}
+			@Override
+			protected boolean computeValue() {
+				return winnerProperty().get().equals(Owner.NONE) && getScore(Owner.NONE).getValue().equals(0);
+			}
+		});
 		// TODO: add full filled board to game over checking
 	}
 }

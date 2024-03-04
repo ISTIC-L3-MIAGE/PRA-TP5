@@ -1,7 +1,5 @@
 package bah.tahi.morpion;
 
-import javafx.beans.property.IntegerProperty;
-
 public enum Owner {
 	NONE, FIRST, SECOND;
 

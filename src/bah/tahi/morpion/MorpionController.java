@@ -2,13 +2,9 @@ package bah.tahi.morpion;
 
 import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class MorpionController {
     @FXML
@@ -42,7 +38,6 @@ public class MorpionController {
 
                 // Lier les propriétés des objets TicTacToeSquare aux propriétés du modèle TicTacToeModel
                 square.ownerProperty().bindBidirectional(model.getSquare(i, j));
-                //square.colorProperty().bind(model.getWinningSquare(0, 0)); // Bug
 
                 // Ajouter les square à la grille
                 this.grid.add(square, i, j);
@@ -62,7 +57,7 @@ public class MorpionController {
 
             @Override
             protected String computeValue() {
-                if ( model.gameOver().get() || !model.turnProperty().get().equals(Owner.FIRST)) {
+                if (model.gameOver().get() || !model.turnProperty().get().equals(Owner.FIRST)) {
                     return "-fx-background-color: red; -fx-text-fill: white;";
                 } else {
                     return "-fx-background-color: cyan; -fx-text-fill: black;";
@@ -78,7 +73,7 @@ public class MorpionController {
 
             @Override
             protected String computeValue() {
-                if ( model.gameOver().get() || !model.turnProperty().get().equals(Owner.SECOND)) {
+                if (model.gameOver().get() || !model.turnProperty().get().equals(Owner.SECOND)) {
                     return "-fx-background-color: red; -fx-text-fill: white;";
                 } else {
                     return "-fx-background-color: cyan; -fx-text-fill: black;";
@@ -86,36 +81,15 @@ public class MorpionController {
             }
         });
 
+
         // Lier d'autres éléments de l'interface utilisateur aux propriétés du modèle TicTacToeModel
         restartButton.setOnAction(event -> model.restart());
         gameOverLabel.textProperty().bind(model.getEndOfGameMessage());
 
-        model.gameOver().addListener((observable, oldValue, newValue) -> {
-            freeCasesLabel.setVisible(!newValue);
-        });
+        freeCasesLabel.visibleProperty().bind(model.gameOver().not());
 
-        model.getScore(Owner.FIRST).addListener((observable, oldValue, newValue) -> {
-            if (newValue.intValue() > 1) {
-                firstCasesLabel.setText(newValue.toString() + " cases pour X");
-            } else {
-                firstCasesLabel.setText(newValue.toString() + " case pour X");
-            }
-        });
-
-        model.getScore(Owner.SECOND).addListener((observable, oldValue, newValue) -> {
-            if (newValue.intValue() > 1) {
-                secondCasesLabel.setText(newValue.toString() + " cases pour O");
-            } else {
-                secondCasesLabel.setText(newValue.toString() + " case pour O");
-            }
-        });
-
-        model.getScore(Owner.NONE).addListener((observable, oldValue, newValue) -> {
-            if (newValue.intValue() > 1) {
-                freeCasesLabel.setText(newValue.toString() + " cases libres");
-            } else {
-                freeCasesLabel.setText(newValue.toString() + " case libre");
-            }
-        });
+        firstCasesLabel.textProperty().bind(model.getScore(Owner.FIRST).asString().concat(" case(s) pour X"));
+        secondCasesLabel.textProperty().bind(model.getScore(Owner.SECOND).asString().concat(" case(s) pour O"));
+        freeCasesLabel.textProperty().bind(model.getScore(Owner.NONE).asString().concat(" case(s) libre(s)"));
     }
 }

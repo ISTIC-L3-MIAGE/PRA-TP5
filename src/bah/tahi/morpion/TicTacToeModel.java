@@ -252,14 +252,7 @@ public class TicTacToeModel {
 	}
 
 	private boolean isBoardFull() {
-		for (int i = 0; i < BOARD_HEIGHT; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				if (getSquare(i, j).get() == Owner.NONE) {
-					return false; // Il y a encore des cases vides
-				}
-			}
-		}
-		return true; // Toutes les cases sont remplies
+		return this.scores.get(Owner.FIRST).add(this.scores.get(Owner.SECOND)).isEqualTo(this.getNbCases()).get();
 	}
 
 	private void markWinningRow(int row) {
@@ -306,12 +299,11 @@ public class TicTacToeModel {
 		return this.scores.get(owner);
 	}
 
-
 	/**
 	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
 		return this.winner.isNotEqualTo(Owner.NONE);
+		// TODO: add full filled board to game over checking
 	}
-
 }

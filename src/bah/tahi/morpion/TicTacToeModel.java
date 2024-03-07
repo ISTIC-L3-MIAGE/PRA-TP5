@@ -219,6 +219,23 @@ public class TicTacToeModel {
     }
 
     /**
+     * @param row    numéro de ligne
+     * @param column numéro de colonne
+     * @return true s’il est possible de jouer dans la case, c’est-à-dire la case est libre et le jeu n’est pas terminé
+     */
+    public BooleanBinding legalMove(int row, int column) {
+        return this.getSquare(row, column).isEqualTo(Owner.NONE).and(this.gameOver().not());
+    }
+
+    /**
+     * @param owner le joueur concerné
+     * @return Le nombre de coups joué par owner
+     */
+    public NumberExpression getScore(Owner owner) {
+        return this.scores.get(owner);
+    }
+
+    /**
      * Met à jour le score d'un joueur.
      *
      * @param owner le joueur dont on doit mettre à jour le score
@@ -278,18 +295,21 @@ public class TicTacToeModel {
      * @return true si la ligne row est une ligne gagnante, false sinon
      */
     private boolean checkRow(int row) {
+        boolean winningRow = true;
         Owner currentPlayer = this.turnProperty().get();
 
         for (int i = 0; i < BOARD_WIDTH; i++) { // Je devrais peut-être utiliser WINNING_COUNT ici
             Owner squareOwner = this.getSquare(row, i).get();
-            if (squareOwner.equals(Owner.NONE) || !squareOwner.equals(currentPlayer)) {
-                return false;
-            }
+            winningRow &= squareOwner.equals(currentPlayer);
         }
 
-        setWinningRow(row);
-        setWinner(currentPlayer);
-        return true;
+        if (winningRow) {
+            setWinningRow(row);
+            setWinner(currentPlayer);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -307,20 +327,25 @@ public class TicTacToeModel {
      * Cette fonction permet de détecter une colonne gagnante
      *
      * @param column numéro de colonne
+     * @return true si la colonne row est une colonne gagnante, false sinon
      */
     private boolean checkColumn(int column) {
+        boolean winningColumn = true;
         Owner currentPlayer = this.turnProperty().get();
 
         for (int i = 0; i < BOARD_WIDTH; i++) { // Je devrais peut-être utiliser WINNING_COUNT ici
             Owner squareOwner = this.getSquare(i, column).get();
-            if (squareOwner.equals(Owner.NONE) || !squareOwner.equals(currentPlayer)) {
-                return false;
-            }
+            winningColumn &= squareOwner.equals(currentPlayer);
         }
 
-        setWinningColumn(column);
-        setWinner(currentPlayer);
-        return true;
+        if (winningColumn) {
+            setWinningColumn(column);
+            setWinner(currentPlayer);
+            return true;
+        }
+
+        return false;
+
     }
 
     /**
@@ -334,66 +359,43 @@ public class TicTacToeModel {
         }
     }
 
+    /**
+     * Cette fonction permet de détecter une diagonale gagnante
+     *
+     * @return true si l'une des diagonales est gagnante, false sinon
+     */
     private boolean checkDiags() {
-        // Vérifier la diagonale principale
-        Owner topLeft = getSquare(0, 0).get();
-        if (topLeft != Owner.NONE && topLeft == getSquare(1, 1).get() && topLeft == getSquare(2, 2).get()) {
-            setWinningDiag(false);
-            setWinner(topLeft);
-            return true;
-        }
-
-        // Vérifier la diagonale inverse
-        Owner topRight = getSquare(0, 2).get();
-        if (topRight != Owner.NONE && topRight == getSquare(1, 1).get() && topRight == getSquare(2, 0).get()) {
-            setWinningDiag(true);
-            setWinner(topRight);
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean checkDiags2() {
-        int i, winningCounter = 0;
+        int i;
+        boolean winningDiag = true;
         Owner currentPlayer = this.turnProperty().get();
 
         // Vérification de la diagonale principale
         for (i = 0; i < BOARD_HEIGHT; i++) {
-            if (currentPlayer.equals(this.getSquare(i, i).get())) {
-                winningCounter++;
-            }
+            Owner squareOwner = this.getSquare(i, i).get();
+            winningDiag &= squareOwner.equals(currentPlayer);
         }
 
-        if (winningCounter >= WINNING_COUNT) {
+        if (winningDiag) {
             setWinningDiag(false);
             setWinner(currentPlayer);
             return true;
         }
 
         // Vérification de la diagonale inverse
-        winningCounter = 0;
+        winningDiag = true;
         for (i = BOARD_HEIGHT - 1; i >= 0; i--) {
-            if (currentPlayer.equals(this.getSquare(i, i).get())) {
-                winningCounter++;
-            }
+            Owner squareOwner = this.getSquare(i, BOARD_WIDTH - 1 - i).get();
+            winningDiag &= squareOwner.equals(currentPlayer);
         }
 
-        if (winningCounter >= WINNING_COUNT) {
+        if (winningDiag) {
             setWinningDiag(true);
             setWinner(currentPlayer);
             return true;
         }
 
-        // Pas de vistoire diagonale détectée
+        // Pas de diagonale gagnante détectée
         return false;
-    }
-
-    /**
-     * @return true si le plateau de jeu est totalement rempli (s'il n'y a plus de case libre), false sinon
-     */
-    private boolean fullBoard() {
-        return this.getScore(Owner.NONE).intValue() == 0;
     }
 
     /**
@@ -412,20 +414,10 @@ public class TicTacToeModel {
     }
 
     /**
-     * @param row    numéro de ligne
-     * @param column numéro de colonne
-     * @return true s’il est possible de jouer dans la case, c’est-à-dire la case est libre et le jeu n’est pas terminé
+     * @return true si le plateau de jeu est totalement rempli (s'il n'y a plus de case libre), false sinon
      */
-    public BooleanBinding legalMove(int row, int column) {
-        return this.getSquare(row, column).isEqualTo(Owner.NONE).and(this.gameOver().not());
-    }
-
-    /**
-     * @param owner le joueur concerné
-     * @return Le nombre de coups joué par owner
-     */
-    public NumberExpression getScore(Owner owner) {
-        return this.scores.get(owner);
+    private boolean fullBoard() {
+        return this.getScore(Owner.NONE).intValue() == 0;
     }
 
     /**

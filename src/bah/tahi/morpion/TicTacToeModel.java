@@ -141,6 +141,22 @@ public class TicTacToeModel {
 		};
 	}
 
+	public final StringExpression getOwnerLabelStyle(Owner owner) {
+		return new StringBinding() {
+			{
+				bind(turnProperty(), gameOver(), winnerProperty());
+			}
+			@Override
+			protected String computeValue() {
+				if (gameOver().get() || !turnProperty().get().equals(owner)) {
+					return "-fx-background-color: red; -fx-text-fill: white;";
+				} else {
+					return "-fx-background-color: cyan; -fx-text-fill: black;";
+				}
+			}
+		};
+	}
+
 	public void setWinner(Owner winner) {
 		this.winnerProperty().set(winner);
 	}
@@ -165,10 +181,10 @@ public class TicTacToeModel {
 	 * Met à jour les scores après chaque coup.
 	 */
 	public void updateScores(Owner owner) {
-		IntegerProperty score = this.scores.get(owner);
+		IntegerProperty ownerScore = this.scores.get(owner);
 		IntegerProperty freeCases = this.scores.get(Owner.NONE);
 
-		score.set(score.get() + 1);
+		ownerScore.set(ownerScore.get() + 1);
 		freeCases.set(freeCases.get() - 1);
 	}
 
@@ -308,14 +324,14 @@ public class TicTacToeModel {
 	 * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
 	 */
 	public BooleanBinding gameOver() {
-		return this.winner.isNotEqualTo(Owner.NONE).or(new BooleanBinding() {
+		return new BooleanBinding() {
 			{
 				bind(winnerProperty(), getScore(Owner.NONE));
 			}
 			@Override
 			protected boolean computeValue() {
-				return winnerProperty().get().equals(Owner.NONE) && getScore(Owner.NONE).getValue().equals(0);
+				return !winnerProperty().get().equals(Owner.NONE) ||getScore(Owner.NONE).getValue().equals(0);
 			}
-		});
+		};
 	}
 }

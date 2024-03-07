@@ -8,41 +8,35 @@ import javafx.scene.layout.GridPane;
 
 public class MorpionController {
     @FXML
-    private GridPane grid;
+    private GridPane grid; // Plateau de jeu sur la vue
 
     @FXML
-    private Button restartButton;
+    private Button restartButton; // Bouton RESTART
 
     @FXML
-    private Label gameOverLabel;
+    private Label gameOverLabel; // Message de fin de partie
 
     @FXML
-    private Label freeCasesLabel;
+    private Label freeCasesLabel; // Nombre de cases libres
 
     @FXML
-    private Label firstCasesLabel;
+    private Label firstCasesLabel; // Score du premier joueur
 
     @FXML
-    private Label secondCasesLabel;
+    private Label secondCasesLabel; // Score du second joueur
 
-    private final TicTacToeModel model = TicTacToeModel.getInstance();
+    private final TicTacToeModel model = TicTacToeModel.getInstance(); // Instance du modèle de jeu
 
-    //@Override
+    @FXML
     public void initialize() {
 
-        // Initialiser les objets TicTacToeSquare
+        // Création des cases et liaison au modèle de jeu
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                // Initialisez tous les objets TicTacToeSquare de manière similaire
                 TicTacToeSquare square = new TicTacToeSquare(i, j);
-
-                // Lier les propriétés des objets TicTacToeSquare aux propriétés du modèle TicTacToeModel
                 square.ownerProperty().bindBidirectional(model.getSquare(i, j));
                 square.winnerProperty().bindBidirectional(model.getWinningSquare(i, j));
-
-                // Ajouter les square à la grille
-                //this.grid.add(square, i, j);
-                this.grid.add(square, j, i);
+                grid.add(square, j, i);
             }
         }
 
@@ -51,39 +45,6 @@ public class MorpionController {
         secondCasesLabel.setText("0 case pour O");
         freeCasesLabel.setText(model.getNbCases() + " cases libres");
 
-        // Binding pour le style CSS du label du premier joueur
-        firstCasesLabel.styleProperty().bind(new StringBinding() {
-            {
-                bind(model.turnProperty(), model.gameOver());
-            }
-
-            @Override
-            protected String computeValue() {
-                if (model.gameOver().get() || !model.turnProperty().get().equals(Owner.FIRST)) {
-                    return "-fx-background-color: red; -fx-text-fill: white;";
-                } else {
-                    return "-fx-background-color: cyan; -fx-text-fill: black;";
-                }
-            }
-        });
-
-        // Binding pour le style CSS du label du deuxième joueur
-        secondCasesLabel.styleProperty().bind(new StringBinding() {
-            {
-                bind(model.turnProperty(), model.gameOver());
-            }
-
-            @Override
-            protected String computeValue() {
-                if (model.gameOver().get() || !model.turnProperty().get().equals(Owner.SECOND)) {
-                    return "-fx-background-color: red; -fx-text-fill: white;";
-                } else {
-                    return "-fx-background-color: cyan; -fx-text-fill: black;";
-                }
-            }
-        });
-
-
         // Lier d'autres éléments de l'interface utilisateur aux propriétés du modèle TicTacToeModel
         restartButton.setOnAction(event -> model.restart());
         gameOverLabel.textProperty().bind(model.getEndOfGameMessage());
@@ -91,7 +52,11 @@ public class MorpionController {
         freeCasesLabel.visibleProperty().bind(model.gameOver().not());
 
         firstCasesLabel.textProperty().bind(model.getScore(Owner.FIRST).asString().concat(" case(s) pour X"));
+        firstCasesLabel.styleProperty().bind(model.getOwnerLabelStyle(Owner.FIRST));
+
         secondCasesLabel.textProperty().bind(model.getScore(Owner.SECOND).asString().concat(" case(s) pour O"));
+        secondCasesLabel.styleProperty().bind(model.getOwnerLabelStyle(Owner.SECOND));
+
         freeCasesLabel.textProperty().bind(model.getScore(Owner.NONE).asString().concat(" case(s) libre(s)"));
     }
 }

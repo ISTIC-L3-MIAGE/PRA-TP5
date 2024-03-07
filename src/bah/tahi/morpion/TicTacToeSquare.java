@@ -6,8 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -37,10 +36,12 @@ public class TicTacToeSquare extends TextField {
 		Background whiteBg = new Background(new BackgroundFill(Color.WHITE, null, null)); // Le fond des cases vides en cours de partie
 		Background greenBg = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null)); // Le fond des cases vides en cours de partie
 		Background redBg = new Background(new BackgroundFill(Color.RED, null, null)); // Le fond des cases vides à la fin d'une partie
+		Border border = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, new BorderWidths(0.5))); // Bordure par défaut des cases
 
 		this.setEditable(false); // Les cases ne sont pas modifiables au clavier
 		this.setFocusTraversable(false); // Inutile de changer le focus des cases
 		this.setFont(normalFont); // On applique la police normale à l'initialisation
+		this.setBorder(border); // On applique les bordures à l'initialisation
 		this.setAlignment(Pos.CENTER); // Centrer le texte dans une case
 		this.setBackground(whiteBg); // Couleur par défaut d'une case
 		this.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Taille pour que la case occupe tout l'espace disponible dans se partie de la grille
@@ -65,8 +66,8 @@ public class TicTacToeSquare extends TextField {
 		});
 
 		this.setOnMouseClicked(event -> {
-			model.play(row, column);
-			this.ownerProperty().set(model.getSquare(row, column).get());
+			model.play(row, column);  // Jouer dans la case (row, column)
+			this.ownerProperty().set(model.getSquare(row, column).get()); // Définir le joueur courant en tant que propriétaire de la case
 		});
 	}
 }

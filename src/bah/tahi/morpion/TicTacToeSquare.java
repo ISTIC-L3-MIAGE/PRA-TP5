@@ -4,72 +4,69 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
+import javax.swing.*;
 
 public class TicTacToeSquare extends TextField {
 
 	private static final TicTacToeModel model = TicTacToeModel.getInstance();
 
-	private final ObjectProperty<Owner> ownerProperty = new SimpleObjectProperty<>(Owner.NONE);
+	private final ObjectProperty<Owner> owner = new SimpleObjectProperty<>(Owner.NONE);
 
-	private final BooleanProperty winnerProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty winner = new SimpleBooleanProperty(false);
 
 	public ObjectProperty<Owner> ownerProperty() {
-		return ownerProperty;
+		return owner;
 	}
 
-	public BooleanProperty colorProperty() {
-		return winnerProperty;
+	public BooleanProperty winnerProperty() {
+		return winner;
 	}
 
 
 	public TicTacToeSquare(final int row, final int column) {
+		// Styles
+		Font normalFont = new Font(30); // Police normale
+		Font bigFont = new Font(50); // Police en cas de victoire
+		Background whiteBg = new Background(new BackgroundFill(Color.WHITE, null, null)); // Le fond des cases vides en cours de partie
+		Background greenBg = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null)); // Le fond des cases vides en cours de partie
+		Background redBg = new Background(new BackgroundFill(Color.RED, null, null)); // Le fond des cases vides à la fin d'une partie
 
-		this.setEditable(false);
-		this.setFocusTraversable(false);
-		this.setStyle("-fx-font-size: 24; -fx-alignment: center;");
+		this.setEditable(false); // Les cases ne sont pas modifiables au clavier
+		this.setFocusTraversable(false); // Inutile de changer le focus des cases
+		this.setFont(normalFont); // On applique la police normale à l'initialisation
+		this.setAlignment(Pos.CENTER); // Centrer le texte dans une case
+		this.setBackground(whiteBg); // Couleur par défaut d'une case
+		this.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Taille pour que la case occupe tout l'espace disponible dans se partie de la grille
 
-		// Définir la taille maximale et minimale pour occuper 100% de l'espace disponible
-		this.setMaxWidth(Double.MAX_VALUE);
-		this.setMaxHeight(Double.MAX_VALUE);
-
-		// Les écouteurs
-		this.ownerProperty.addListener((observable, oldValue, newValue) -> {
-			setText(newValue.toString());
-			setDisable(newValue != Owner.NONE);
+		// Les observateurs
+		this.ownerProperty().addListener((observable, oldValue, newValue) -> {
+			this.setText(newValue.toString()); // On affecte la lettre correspondante au nouveau propriétaire de la case
+			this.setDisable(!newValue.equals(Owner.NONE)); // On désactive la case si elle n'est plus vide
 		});
 
-		this.winnerProperty.addListener((observable, oldValue, newValue) -> {
-			if (newValue) {
-				this.setStyle("-fx-font-size: 34; -fx-alignment: center;");
-			}
+		this.winnerProperty().addListener((observable, oldValue, newValue) -> {
+			this.setFont(newValue ? bigFont : normalFont); // On agrandit la police si this est une case gagnante
 		});
 
-		// Définir la couleur de fond en fonction de l'état de la partie et du survol de la souris
+		// Les évènements liés à la souris
 		this.setOnMouseEntered(event -> {
-			if (!model.gameOver().get()) {
-				this.setStyle("-fx-font-size: 24; -fx-alignment: center; -fx-background-color: lightgreen;");
-			} else {
-				this.setStyle("-fx-font-size: 24; -fx-alignment: center; -fx-background-color: red;");
-			}
+			this.setBackground(model.gameOver().get() ? redBg : greenBg); // On change la couleur de la case au survol de la souris et fonction de l'état de la partie
 		});
 
 		this.setOnMouseExited(event -> {
-			this.setStyle("-fx-font-size: 24; -fx-alignment: center;");
+			this.setBackground(whiteBg); // On remets la couleur par défaut lorsque la souris sors de la case
 		});
 
 		this.setOnMouseClicked(event -> {
-			if (model.legalMove(row, column).get()) {
-				model.play(row, column);
-				ownerProperty.set(model.getSquare(row, column).get());
-				if (model.gameOver().get()) {
-					model.winnerProperty().addListener((observable, oldValue, newValue) -> {
-						if (!newValue.equals(Owner.NONE)) {
-							winnerProperty.set(true);
-						}
-					});
-				}
-			}
+			model.play(row, column);
+			this.ownerProperty().set(model.getSquare(row, column).get());
 		});
 	}
 }

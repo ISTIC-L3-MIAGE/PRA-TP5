@@ -38,6 +38,7 @@ public class MorpionController {
 
                 // Lier les propriétés des objets TicTacToeSquare aux propriétés du modèle TicTacToeModel
                 square.ownerProperty().bindBidirectional(model.getSquare(i, j));
+                square.winnerProperty().bindBidirectional(model.getWinningSquare(i, j));
 
                 // Ajouter les square à la grille
                 //this.grid.add(square, i, j);

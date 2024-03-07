@@ -176,10 +176,12 @@ public class TicTacToeModel {
 	 * Jouer dans la case (row, column) quand c’est possible.
 	 */
 	public void play(int row, int column) {
-		this.board[row][column].set(this.turnProperty().get());
-		this.updateScores(this.turnProperty().get());
-		this.checkWin();
-		this.nextPlayer();
+		if (this.validSquare(row, column) && this.legalMove(row, column).get()) {
+			this.getSquare(row, column).set(this.turnProperty().get());
+			this.updateScores(this.turnProperty().get());
+			this.checkWin();
+			this.nextPlayer();
+		}
 	}
 
 	public void checkWin() {
@@ -238,7 +240,7 @@ public class TicTacToeModel {
 		// Vérifier la diagonale principale
 		Owner topLeft = getSquare(0, 0).get();
 		if (topLeft != Owner.NONE && topLeft == getSquare(1, 1).get() && topLeft == getSquare(2, 2).get()) {
-			markWinningDiagonal(true);
+			markWinningDiagonal(false);
 			setWinner(topLeft);
 			return true;
 		}
@@ -246,7 +248,7 @@ public class TicTacToeModel {
 		// Vérifier la diagonale inverse
 		Owner topRight = getSquare(0, 2).get();
 		if (topRight != Owner.NONE && topRight == getSquare(1, 1).get() && topRight == getSquare(2, 0).get()) {
-			markWinningDiagonal(false);
+			markWinningDiagonal(true);
 			setWinner(topRight);
 			return true;
 		}
@@ -315,6 +317,5 @@ public class TicTacToeModel {
 				return winnerProperty().get().equals(Owner.NONE) && getScore(Owner.NONE).getValue().equals(0);
 			}
 		});
-		// TODO: add full filled board to game over checking
 	}
 }

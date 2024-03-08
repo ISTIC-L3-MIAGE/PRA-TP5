@@ -13,8 +13,8 @@ public class TicTacToeModel {
     /**
      * Taille du plateau de jeu (pour être extensible).
      */
-    private final static int BOARD_WIDTH = 3;
-    private final static int BOARD_HEIGHT = 3;
+    private final static int BOARD_WIDTH = 5;
+    private final static int BOARD_HEIGHT = 5;
 
     /**
      * Nombre de pièces alignées pour gagner (idem).
@@ -297,15 +297,16 @@ public class TicTacToeModel {
      * @return true si la ligne row est une ligne gagnante, false sinon
      */
     private boolean checkRow(int row) {
-        boolean winningRow = true;
+        int i = 0, winCounter = 0;
         Owner currentPlayer = this.turnProperty().get();
 
-        for (int i = 0; i < BOARD_WIDTH; i++) { // Je devrais peut-être utiliser WINNING_COUNT ici
+        while (i < BOARD_WIDTH && winCounter != WINNING_COUNT) {
             Owner squareOwner = this.getSquare(row, i).get();
-            winningRow &= squareOwner.equals(currentPlayer);
+            winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
+            i++;
         }
 
-        if (winningRow) {
+        if (winCounter == WINNING_COUNT) {
             setWinningRow(row);
             setWinner(currentPlayer);
             return true;
@@ -332,22 +333,22 @@ public class TicTacToeModel {
      * @return true si la colonne row est une colonne gagnante, false sinon
      */
     private boolean checkColumn(int column) {
-        boolean winningColumn = true;
+        int i = 0, winCounter = 0;
         Owner currentPlayer = this.turnProperty().get();
 
-        for (int i = 0; i < BOARD_WIDTH; i++) { // Je devrais peut-être utiliser WINNING_COUNT ici
+        while (i < BOARD_HEIGHT && winCounter != WINNING_COUNT) {
             Owner squareOwner = this.getSquare(i, column).get();
-            winningColumn &= squareOwner.equals(currentPlayer);
+            winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
+            i++;
         }
 
-        if (winningColumn) {
+        if (winCounter == WINNING_COUNT) {
             setWinningColumn(column);
             setWinner(currentPlayer);
             return true;
         }
 
         return false;
-
     }
 
     /**

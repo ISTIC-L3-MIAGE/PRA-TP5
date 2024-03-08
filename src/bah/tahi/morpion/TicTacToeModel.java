@@ -13,8 +13,8 @@ public class TicTacToeModel {
     /**
      * Taille du plateau de jeu (pour être extensible).
      */
-    private final static int BOARD_WIDTH = 3;
-    private final static int BOARD_HEIGHT = 3;
+    private final static int BOARD_WIDTH = 5;
+    private final static int BOARD_HEIGHT = 5;
 
     /**
      * Nombre de pièces alignées pour gagner (idem).
@@ -222,7 +222,7 @@ public class TicTacToeModel {
      * @param row    numéro de ligne
      * @param column numéro de colonne
      * @return true s’il est possible de jouer dans la case, c’est-à-dire la case
-     *         est libre et le jeu n’est pas terminé
+     * est libre et le jeu n’est pas terminé
      */
     public BooleanBinding legalMove(int row, int column) {
         return this.getSquare(row, column).isEqualTo(Owner.NONE).and(this.gameOver().not());
@@ -418,7 +418,7 @@ public class TicTacToeModel {
 
     /**
      * @return true si le plateau de jeu est totalement rempli (s'il n'y a plus de
-     *         case libre), false sinon
+     * case libre), false sinon
      */
     private boolean fullBoard() {
         return this.getScore(Owner.NONE).intValue() == 0;
@@ -426,7 +426,7 @@ public class TicTacToeModel {
 
     /**
      * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a
-     *         plus de cases à jouer)
+     * plus de cases à jouer)
      */
     public BooleanBinding gameOver() {
         return new BooleanBinding() {

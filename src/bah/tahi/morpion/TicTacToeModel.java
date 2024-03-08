@@ -287,7 +287,8 @@ public class TicTacToeModel {
         }
 
         // Parcours des diagonales
-        checkDiags();
+        //checkDiags();
+        checkMainDiag();
 
         // Match nul si aucune victoire et plus de case libre
     }
@@ -359,6 +360,50 @@ public class TicTacToeModel {
     private void setWinningColumn(int column, int startRow, int endRow) {
         for (int row = startRow; row < endRow; row++) {
             getWinningSquare(row, column).set(true);
+        }
+    }
+
+    /**
+     *
+     */
+    private boolean checkMainDiag() {
+        int startRow = BOARD_HEIGHT - WINNING_COUNT;
+        int row = 0, column = 0;
+        int winCounter = 0;
+        Owner currentPlayer = this.turnProperty().get();
+
+        while (startRow >= 0 && winCounter != WINNING_COUNT) {
+            row = startRow;
+            column = 0;
+            winCounter = 0;
+
+            while (row < BOARD_HEIGHT && column < BOARD_WIDTH && winCounter != WINNING_COUNT) {
+                Owner squareOwner = this.getSquare(row, column).get();
+                winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
+                row++;
+                column++;
+            }
+
+            startRow--;
+        }
+
+        if (winCounter == WINNING_COUNT) {
+            setWinningMainDiag(row - WINNING_COUNT, column - WINNING_COUNT);
+            setWinner(currentPlayer);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
+    private void setWinningMainDiag(int startRow, int startColumn) {
+        int column = startColumn;
+        for (int row = startRow; row < startRow + WINNING_COUNT; row++) {
+            getWinningSquare(row, column).set(true);
+            column++;
         }
     }
 

@@ -51,12 +51,10 @@ public class MorpionController {
     @FXML
     public void initialize() {
 
-        // Création des cases et liaison au modèle de jeu
+        // Création et ajout des cases à la grille
         for (int i = 0; i < model.getBoardHeight(); i++) {
             for (int j = 0; j < model.getBoardWidth(); j++) {
                 TicTacToeSquare square = new TicTacToeSquare(i, j);
-                square.ownerProperty().bindBidirectional(model.getSquare(i, j));
-                square.winnerProperty().bindBidirectional(model.getWinningSquare(i, j));
                 grid.add(square, j, i);
             }
         }

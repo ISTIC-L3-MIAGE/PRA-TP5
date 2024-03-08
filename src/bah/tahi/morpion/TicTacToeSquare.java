@@ -41,6 +41,10 @@ public class TicTacToeSquare extends TextField {
         setBackground(whiteBg); // Couleur par défaut d'une case
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Taille pour que la case occupe tout l'espace disponible dans se partie de la grille
 
+        // Bindings
+        ownerProperty().bind(model.getSquare(row, column));
+        winnerProperty().bind(model.getWinningSquare(row, column));
+
         // Les observateurs
         ownerProperty().addListener((observable, oldValue, newValue) -> {
             setText(newValue.toString()); // On affecte la lettre correspondante au nouveau propriétaire de la case
@@ -55,7 +59,7 @@ public class TicTacToeSquare extends TextField {
         setOnMouseEntered(event -> {
             setBackground(model.gameOver().get() ? redBg : greenBg); // On change la couleur de la case au survol de la souris et fonction de l'état de la partie
             if (!model.gameOver().get() && ownerProperty().get().equals(Owner.NONE)) {
-                setCursor(Cursor.HAND);
+                setCursor(Cursor.HAND); // On change le curseur au survol de la souris
             }
         });
 
@@ -66,7 +70,6 @@ public class TicTacToeSquare extends TextField {
 
         setOnMouseClicked(event -> {
             model.play(row, column);  // Jouer dans la case (row, column)
-            ownerProperty().set(model.getSquare(row, column).get()); // Définir le joueur courant en tant que propriétaire de la case
         });
     }
 

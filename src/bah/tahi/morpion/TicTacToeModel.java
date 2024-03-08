@@ -13,7 +13,7 @@ public class TicTacToeModel {
     /**
      * Taille du plateau de jeu (pour être extensible).
      */
-    private final static int BOARD_WIDTH = 3;
+    private final static int BOARD_WIDTH = 4;
     private final static int BOARD_HEIGHT = 3;
 
     /**

@@ -368,7 +368,9 @@ public class TicTacToeModel {
     }
 
     /**
+     * Cette fonction permet de détecter une diagonale principale gagnante
      *
+     * @return true si l'une des diagonales principales est gagnante, false sinon
      */
     private boolean checkMainDiag() {
         int startRow = BOARD_HEIGHT - WINNING_COUNT;
@@ -377,11 +379,12 @@ public class TicTacToeModel {
         int startColumn = 0;
         int endColumn = BOARD_WIDTH - WINNING_COUNT + 1;
 
-        int currentRow = 0, currentColumn = 0;
+        int currentRow = startRow, currentColumn = startColumn;
         int winCounter = 0;
 
         Owner currentPlayer = this.turnProperty().get();
 
+        // Parcours des cases
         while ((startRow > endRow || startColumn < endColumn) && winCounter < WINNING_COUNT) {
             currentRow = startRow;
             currentColumn = startColumn;
@@ -411,7 +414,10 @@ public class TicTacToeModel {
     }
 
     /**
+     * Cette fonction permet de marquer une diagonale principale comme diagonale gagnante
      *
+     * @param startRow    numéro de la ligne de départ
+     * @param startColumn numéro de la colonne de départ
      */
     private void setWinningMainDiag(int startRow, int startColumn) {
         int row = startRow;
@@ -425,8 +431,68 @@ public class TicTacToeModel {
         }
     }
 
+    /**
+     * Cette fonction permet de détecter une diagonale inverse gagnante
+     *
+     * @return true si l'une des diagonales inverses est gagnante, false sinon
+     */
     private boolean checkReverseDiag() {
+        int startRow = BOARD_HEIGHT - WINNING_COUNT;
+        int endRow = 0;
+
+        int startColumn = BOARD_WIDTH - 1;
+        int endColumn = WINNING_COUNT - 1;
+
+        int currentRow = startRow, currentColumn = startColumn;
+        int winCounter = 0;
+
+        Owner currentPlayer = this.turnProperty().get();
+
+        // Parcours des cases
+        while ((startRow > endRow || startColumn >= endColumn) && winCounter < WINNING_COUNT) {
+            currentRow = startRow;
+            currentColumn = startColumn;
+            winCounter = 0;
+
+            while (currentRow < BOARD_HEIGHT && currentColumn >= 0 && winCounter < WINNING_COUNT) {
+                Owner squareOwner = this.getSquare(currentRow, currentColumn).get();
+                winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
+                currentRow++;
+                currentColumn--;
+            }
+
+            if (startRow > endRow) {
+                startRow--;
+            } else if (startColumn >= endColumn) {
+                startColumn--;
+            }
+        }
+
+        if (winCounter == WINNING_COUNT) {
+            setWinningReverseDiag(currentRow - WINNING_COUNT, currentColumn + WINNING_COUNT);
+            setWinner(currentPlayer);
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Cette fonction permet de marquer une diagonale inverse comme diagonale gagnante
+     *
+     * @param startRow    numéro de la ligne de départ
+     * @param startColumn numéro de la colonne de départ
+     */
+    private void setWinningReverseDiag(int startRow, int startColumn) {
+        int row = startRow;
+        int column = startColumn;
+        int endRow = startRow + WINNING_COUNT;
+
+        while (row < endRow) {
+            getWinningSquare(row, column).set(true);
+            row++;
+            column--;
+        }
     }
 
     /**

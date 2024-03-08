@@ -13,7 +13,7 @@ public class TicTacToeModel {
     /**
      * Taille du plateau de jeu (pour être extensible).
      */
-    private final static int BOARD_WIDTH = 4;
+    private final static int BOARD_WIDTH = 3;
     private final static int BOARD_HEIGHT = 3;
 
     /**
@@ -221,7 +221,8 @@ public class TicTacToeModel {
     /**
      * @param row    numéro de ligne
      * @param column numéro de colonne
-     * @return true s’il est possible de jouer dans la case, c’est-à-dire la case est libre et le jeu n’est pas terminé
+     * @return true s’il est possible de jouer dans la case, c’est-à-dire la case
+     *         est libre et le jeu n’est pas terminé
      */
     public BooleanBinding legalMove(int row, int column) {
         return this.getSquare(row, column).isEqualTo(Owner.NONE).and(this.gameOver().not());
@@ -265,7 +266,8 @@ public class TicTacToeModel {
     }
 
     /**
-     * Cette fonction parcours la matrice en ligne, colonne et diagonale pour détecter d'éventuels cas de victoire
+     * Cette fonction parcours la matrice en ligne, colonne et diagonale pour
+     * détecter d'éventuels cas de victoire
      */
     public void checkWinningCases() {
         int i;
@@ -399,7 +401,8 @@ public class TicTacToeModel {
     }
 
     /**
-     * @param reverse mettre à true si on veut marquer la diagonale inverse, false sinon.
+     * @param reverse mettre à true si on veut marquer la diagonale inverse, false
+     *                sinon.
      */
     private void setWinningDiag(boolean reverse) {
         if (!reverse) {
@@ -414,14 +417,16 @@ public class TicTacToeModel {
     }
 
     /**
-     * @return true si le plateau de jeu est totalement rempli (s'il n'y a plus de case libre), false sinon
+     * @return true si le plateau de jeu est totalement rempli (s'il n'y a plus de
+     *         case libre), false sinon
      */
     private boolean fullBoard() {
         return this.getScore(Owner.NONE).intValue() == 0;
     }
 
     /**
-     * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a plus de cases à jouer)
+     * @return true si le jeu est terminé (soit un joueur a gagné, soit il n’y a
+     *         plus de cases à jouer)
      */
     public BooleanBinding gameOver() {
         return new BooleanBinding() {

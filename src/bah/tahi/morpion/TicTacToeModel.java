@@ -297,17 +297,17 @@ public class TicTacToeModel {
      * @return true si la ligne row est une ligne gagnante, false sinon
      */
     private boolean checkRow(int row) {
-        int i = 0, winCounter = 0;
+        int column = 0, winCounter = 0;
         Owner currentPlayer = this.turnProperty().get();
 
-        while (i < BOARD_WIDTH && winCounter != WINNING_COUNT) {
-            Owner squareOwner = this.getSquare(row, i).get();
+        while (column < BOARD_WIDTH && winCounter != WINNING_COUNT) {
+            Owner squareOwner = this.getSquare(row, column).get();
             winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
-            i++;
+            column++;
         }
 
         if (winCounter == WINNING_COUNT) {
-            setWinningRow(row);
+            setWinningRow(row, column - WINNING_COUNT, column);
             setWinner(currentPlayer);
             return true;
         }
@@ -320,9 +320,9 @@ public class TicTacToeModel {
      *
      * @param row numéro de ligne
      */
-    private void setWinningRow(int row) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            getWinningSquare(row, j).set(true);
+    private void setWinningRow(int row, int startColumn, int endColumn) {
+        for (int column = startColumn; column < endColumn; column++) {
+            getWinningSquare(row, column).set(true);
         }
     }
 
@@ -333,17 +333,17 @@ public class TicTacToeModel {
      * @return true si la colonne row est une colonne gagnante, false sinon
      */
     private boolean checkColumn(int column) {
-        int i = 0, winCounter = 0;
+        int row = 0, winCounter = 0;
         Owner currentPlayer = this.turnProperty().get();
 
-        while (i < BOARD_HEIGHT && winCounter != WINNING_COUNT) {
-            Owner squareOwner = this.getSquare(i, column).get();
+        while (row < BOARD_HEIGHT && winCounter != WINNING_COUNT) {
+            Owner squareOwner = this.getSquare(row, column).get();
             winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
-            i++;
+            row++;
         }
 
         if (winCounter == WINNING_COUNT) {
-            setWinningColumn(column);
+            setWinningColumn(column, row - WINNING_COUNT, row);
             setWinner(currentPlayer);
             return true;
         }
@@ -356,9 +356,9 @@ public class TicTacToeModel {
      *
      * @param column numéro de colonne
      */
-    private void setWinningColumn(int column) {
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            getWinningSquare(i, column).set(true);
+    private void setWinningColumn(int column, int startRow, int endRow) {
+        for (int row = startRow; row < endRow; row++) {
+            getWinningSquare(row, column).set(true);
         }
     }
 

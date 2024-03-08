@@ -288,7 +288,11 @@ public class TicTacToeModel {
 
         // Parcours des diagonales
         //checkDiags();
-        checkMainDiag();
+        if (checkMainDiag()) {
+            return;
+        }
+
+        checkReverseDiag();
 
         // Match nul si aucune victoire et plus de case libre
     }
@@ -371,23 +375,23 @@ public class TicTacToeModel {
         int endRow = 0;
 
         int startColumn = 0;
-        int endColumn = BOARD_WIDTH - WINNING_COUNT;
+        int endColumn = BOARD_WIDTH - WINNING_COUNT + 1;
 
-        int row = 0, column = 0;
+        int currentRow = 0, currentColumn = 0;
         int winCounter = 0;
 
         Owner currentPlayer = this.turnProperty().get();
 
-        while ((startRow > endRow || startColumn < endColumn) && winCounter != WINNING_COUNT) {
-            row = startRow;
-            column = startColumn;
+        while ((startRow > endRow || startColumn < endColumn) && winCounter < WINNING_COUNT) {
+            currentRow = startRow;
+            currentColumn = startColumn;
             winCounter = 0;
 
-            while (row < BOARD_HEIGHT && column < BOARD_WIDTH && winCounter != WINNING_COUNT) {
-                Owner squareOwner = this.getSquare(row, column).get();
+            while (currentRow < BOARD_HEIGHT && currentColumn < BOARD_WIDTH && winCounter < WINNING_COUNT) {
+                Owner squareOwner = this.getSquare(currentRow, currentColumn).get();
                 winCounter = squareOwner.equals(currentPlayer) ? winCounter + 1 : 0;
-                row++;
-                column++;
+                currentRow++;
+                currentColumn++;
             }
 
             if (startRow > endRow) {
@@ -398,7 +402,7 @@ public class TicTacToeModel {
         }
 
         if (winCounter == WINNING_COUNT) {
-            setWinningMainDiag(row - WINNING_COUNT, column - WINNING_COUNT);
+            setWinningMainDiag(currentRow - WINNING_COUNT, currentColumn - WINNING_COUNT);
             setWinner(currentPlayer);
             return true;
         }
@@ -419,6 +423,10 @@ public class TicTacToeModel {
             row++;
             column++;
         }
+    }
+
+    private boolean checkReverseDiag() {
+        return false;
     }
 
     /**

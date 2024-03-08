@@ -8,7 +8,7 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bah.tahi.morpion.MorpionController">
    <children>
-      <AnchorPane fx:id="gridContainer" layoutX="100.0" layoutY="100.0" prefHeight="400.0" prefWidth="400.0" />
+      <AnchorPane fx:id="gridContainer" layoutX="100.0" layoutY="100.0" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: lightgrey;" />
       <Label fx:id="firstCasesLabel" layoutX="99.0" layoutY="518.0" style="-fx-background-color: cyan;" text="0 case pour X">
          <font>
             <Font name="System Bold" size="13.0" />

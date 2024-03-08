@@ -26,8 +26,8 @@ public class TicTacToeSquare extends TextField {
 
     public TicTacToeSquare(final int row, final int column) {
         // Styles
-        Font normalFont = new Font(30); // Police normale
-        Font bigFont = new Font(50); // Police en cas de victoire
+        Font normalFont = new Font((double) 100 / model.getBoardHeight()); // Police normale
+        Font bigFont = new Font((double) 150 / model.getBoardHeight()); // Police en cas de victoire
         Background whiteBg = new Background(new BackgroundFill(Color.WHITE, null, null)); // Le fond des cases vides en cours de partie
         Background greenBg = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null)); // Le fond des cases vides en cours de partie
         Background redBg = new Background(new BackgroundFill(Color.RED, null, null)); // Le fond des cases vides à la fin d'une partie

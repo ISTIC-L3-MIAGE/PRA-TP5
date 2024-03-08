@@ -368,13 +368,19 @@ public class TicTacToeModel {
      */
     private boolean checkMainDiag() {
         int startRow = BOARD_HEIGHT - WINNING_COUNT;
+        int endRow = 0;
+
+        int startColumn = 0;
+        int endColumn = BOARD_WIDTH - WINNING_COUNT;
+
         int row = 0, column = 0;
         int winCounter = 0;
+
         Owner currentPlayer = this.turnProperty().get();
 
-        while (startRow >= 0 && winCounter != WINNING_COUNT) {
+        while ((startRow > endRow || startColumn < endColumn) && winCounter != WINNING_COUNT) {
             row = startRow;
-            column = 0;
+            column = startColumn;
             winCounter = 0;
 
             while (row < BOARD_HEIGHT && column < BOARD_WIDTH && winCounter != WINNING_COUNT) {
@@ -384,7 +390,11 @@ public class TicTacToeModel {
                 column++;
             }
 
-            startRow--;
+            if (startRow > endRow) {
+                startRow--;
+            } else if (startColumn < endColumn) {
+                startColumn++;
+            }
         }
 
         if (winCounter == WINNING_COUNT) {
@@ -400,9 +410,13 @@ public class TicTacToeModel {
      *
      */
     private void setWinningMainDiag(int startRow, int startColumn) {
+        int row = startRow;
         int column = startColumn;
-        for (int row = startRow; row < startRow + WINNING_COUNT; row++) {
+        int endRow = startRow + WINNING_COUNT;
+
+        while (row < endRow) {
             getWinningSquare(row, column).set(true);
+            row++;
             column++;
         }
     }

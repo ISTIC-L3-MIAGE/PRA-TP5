@@ -286,12 +286,12 @@ public class TicTacToeModel {
             }
         }
 
-        // Parcours des diagonales
-        //checkDiags();
+        // Parcours des diagonales principales
         if (checkMainDiag()) {
             return;
         }
 
+        // Parcours des diagonales inverses
         checkReverseDiag();
 
         // Match nul si aucune victoire et plus de case libre
@@ -323,7 +323,9 @@ public class TicTacToeModel {
     /**
      * Cette fonction permet de définir une ligne en tant que ligne gagnante
      *
-     * @param row numéro de ligne
+     * @param row         numéro de ligne
+     * @param startColumn numéro de la colonne de début
+     * @param endColumn   numéro de la colonne de fin
      */
     private void setWinningRow(int row, int startColumn, int endColumn) {
         for (int column = startColumn; column < endColumn; column++) {
@@ -359,7 +361,9 @@ public class TicTacToeModel {
     /**
      * Cette fonction permet de définir une colonne en tant que colonne gagnante
      *
-     * @param column numéro de colonne
+     * @param column   numéro de colonne
+     * @param startRow numéro de la ligne de début
+     * @param endRow   numéro de la ligne de fin
      */
     private void setWinningColumn(int column, int startRow, int endRow) {
         for (int row = startRow; row < endRow; row++) {
@@ -492,61 +496,6 @@ public class TicTacToeModel {
             getWinningSquare(row, column).set(true);
             row++;
             column--;
-        }
-    }
-
-    /**
-     * Cette fonction permet de détecter une diagonale gagnante
-     *
-     * @return true si l'une des diagonales est gagnante, false sinon
-     */
-    private boolean checkDiags() {
-        int i;
-        boolean winningDiag = true;
-        Owner currentPlayer = this.turnProperty().get();
-
-        // Vérification de la diagonale principale
-        for (i = 0; i < BOARD_HEIGHT; i++) {
-            Owner squareOwner = this.getSquare(i, i).get();
-            winningDiag &= squareOwner.equals(currentPlayer);
-        }
-
-        if (winningDiag) {
-            setWinningDiag(false);
-            setWinner(currentPlayer);
-            return true;
-        }
-
-        // Vérification de la diagonale inverse
-        winningDiag = true;
-        for (i = BOARD_HEIGHT - 1; i >= 0; i--) {
-            Owner squareOwner = this.getSquare(i, BOARD_WIDTH - 1 - i).get();
-            winningDiag &= squareOwner.equals(currentPlayer);
-        }
-
-        if (winningDiag) {
-            setWinningDiag(true);
-            setWinner(currentPlayer);
-            return true;
-        }
-
-        // Pas de diagonale gagnante détectée
-        return false;
-    }
-
-    /**
-     * @param reverse mettre à true si on veut marquer la diagonale inverse, false
-     *                sinon.
-     */
-    private void setWinningDiag(boolean reverse) {
-        if (!reverse) {
-            for (int i = 0; i < BOARD_HEIGHT; i++) {
-                getWinningSquare(i, i).set(true);
-            }
-        } else {
-            for (int i = 0; i < BOARD_HEIGHT; i++) {
-                getWinningSquare(i, BOARD_WIDTH - 1 - i).set(true);
-            }
         }
     }
 

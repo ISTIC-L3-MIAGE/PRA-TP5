@@ -13,7 +13,7 @@ import bah.tahi.morpion.TicTacToeModel;
 public class TestMorpion {
 
 	/**
-	 * Instance du modèle de jeu
+	 * Instance du modèle de jeu.
 	 */
 	private final TicTacToeModel morpions = TicTacToeModel.getInstance();
 	private final int NB_CASES = morpions.getNbCases();

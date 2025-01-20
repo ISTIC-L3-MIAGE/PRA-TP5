@@ -2,7 +2,7 @@
   <configuration default="false" name="MainMorpion" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="bah.tahi.morpion.MainMorpion" />
     <module name="PRA-TP5" />
-    <option name="VM_PARAMETERS" value="--module-path &quot;$PROJECT_DIR$/../javafx-sdk-21.0.2/lib&quot; --add-modules=javafx.controls,javafx.fxml" />
+    <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\bahsa\Documents\projets\PRA\PRA-TP5\lib\javafx-sdk-21.0.5\lib&quot; --add-modules=javafx.controls,javafx.fxml" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
